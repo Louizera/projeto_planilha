@@ -1,1 +1,1158 @@
 
+
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ORGANIZA — Seu Organizador de Vida & Projeto Planilha</title>
+    <!-- Carregando Tailwind CSS para estilização moderna e responsiva -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fonte Inter do Google Fonts para legibilidade profissional -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Ícones Lucide via CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Ajustes finos de barra de rolagem e transições suaves */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+        .fade-in {
+            animation: fadeIn 0.25s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Estilo sutil para células da planilha */
+        .spreadsheet-row:hover {
+            background-color: #f1f5f9;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-brand-600 selection:text-white">
+
+    <!-- ===================================================================== -->
+    <!-- BARRA DE NAVEGAÇÃO SUPERIOR (GLOBAL)                                  -->
+    <!-- ===================================================================== -->
+    <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <!-- Logotipo e Nome do Projeto -->
+            <div class="flex items-center gap-3 cursor-pointer" onclick="switchView('landing')">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-600 to-brand-800 flex items-center justify-center text-white shadow-md shadow-brand-600/20">
+                    <i data-lucide="layout-grid" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <span class="text-xl font-extrabold tracking-tight text-slate-900">ORGANIZA</span>
+                    <span class="hidden sm:inline-block ml-2 text-[11px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-brand-50 text-brand-700 border border-brand-200">
+                        Projeto Planilha
+                    </span>
+                </div>
+            </div>
+
+            <!-- Navegação Central (Visível na Landing Page) -->
+            <nav id="landing-nav-links" class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
+                <a href="#sobre" class="hover:text-brand-600 transition-colors">Sobre o Produto</a>
+                <a href="#funcionalidades" class="hover:text-brand-600 transition-colors">Funcionalidades</a>
+                <a href="#como-funciona" class="hover:text-brand-600 transition-colors">Como Funciona</a>
+            </nav>
+
+            <!-- Botões de Ação e Alternância de Tela -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                <!-- Botões exibidos quando estiver na Landing Page -->
+                <div id="auth-buttons-group" class="flex items-center gap-2 sm:gap-3">
+                    <button onclick="openAuthModal('login')" class="px-4 py-2 text-sm font-semibold text-slate-700 hover:text-brand-600 hover:bg-slate-100 rounded-xl transition-all">
+                        Entrar
+                    </button>
+                    <button onclick="openAuthModal('register')" class="px-4 py-2 text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-xl shadow-sm shadow-brand-600/25 transition-all">
+                        Cadastrar
+                    </button>
+                </div>
+
+                <!-- Botões exibidos quando estiver no Painel Principal -->
+                <div id="dashboard-nav-group" class="hidden flex items-center gap-2 sm:gap-3">
+                    <span id="user-greeting" class="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 bg-slate-100 px-3 py-1.5 rounded-xl">
+                        <i data-lucide="user-check" class="w-4 h-4 text-brand-600"></i>
+                        <span id="user-name-display">Visitante</span>
+                    </span>
+                    <button onclick="switchView('landing')" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-sm font-semibold text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 rounded-xl transition-all">
+                        <i data-lucide="home" class="w-4 h-4"></i>
+                        <span>Início</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===================================================================== -->
+    <!-- VISÃO 1: PÁGINA INICIAL (LANDING PAGE)                                -->
+    <!-- ===================================================================== -->
+    <main id="landing-view" class="flex-1 fade-in">
+        
+        <!-- Hero Section (Apresentação Principal do Produto) -->
+        <section id="sobre" class="relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-28 bg-gradient-to-b from-white via-slate-50 to-slate-100/70 border-b border-slate-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid lg:grid-cols-12 gap-12 items-center">
+                    
+                    <!-- Coluna de Texto -->
+                    <div class="lg:col-span-6 text-center lg:text-left">
+                        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-50 border border-brand-200 text-brand-700 text-xs font-semibold mb-6">
+                            <span class="w-2 h-2 rounded-full bg-brand-600 animate-pulse"></span>
+                            Versão 1.0 • Simples, Visual e Direto ao Ponto
+                        </div>
+                        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight leading-[1.12]">
+                            Organize sua vida com a clareza de uma <span class="text-brand-600">planilha inteligente.</span>
+                        </h1>
+                        <p class="mt-6 text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto lg:mx-0">
+                            O <strong>ORGANIZA</strong> transforma a bagunça do dia a dia em um painel visual único. Controle tarefas, metas pessoais, prazos e finanças sem complicação — tudo salvo automaticamente no seu navegador.
+                        </p>
+
+                        <!-- CTAs Principais -->
+                        <div class="mt-8 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+                            <button onclick="switchView('dashboard')" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 text-base font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-xl shadow-lg shadow-brand-600/25 transition-all hover:-translate-y-0.5">
+                                <i data-lucide="table-2" class="w-5 h-5"></i>
+                                <span>Acessar Minha Planilha Agora</span>
+                            </button>
+                            <button onclick="openAuthModal('register')" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 text-base font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-xl transition-all">
+                                <i data-lucide="user-plus" class="w-5 h-5 text-brand-600"></i>
+                                <span>Criar Conta Gratuita</span>
+                            </button>
+                        </div>
+
+                        <!-- Selos de Confiança / Benefícios Rápidos -->
+                        <div class="mt-8 pt-6 border-t border-slate-200/80 flex flex-wrap items-center justify-center lg:justify-start gap-6 text-sm text-slate-500">
+                            <div class="flex items-center gap-2">
+                                <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i>
+                                <span>100% em Português</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i>
+                                <span>Salvamento Automático</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i>
+                                <span>Zero Configuração</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Coluna Visual: Prévia Estilizada do Painel Planilha -->
+                    <div class="lg:col-span-6">
+                        <div class="bg-white rounded-2xl shadow-2xl shadow-slate-300/60 border border-slate-200 overflow-hidden">
+                            <!-- Barra superior estilo janela -->
+                            <div class="bg-slate-900 px-4 py-3 flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-3 h-3 rounded-full bg-rose-500"></span>
+                                    <span class="w-3 h-3 rounded-full bg-amber-400"></span>
+                                    <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                                </div>
+                                <span class="text-xs font-medium text-slate-400">organiza.app / projeto-planilha</span>
+                                <span class="text-xs text-brand-400 font-semibold">Ao Vivo</span>
+                            </div>
+                            <!-- Conteúdo simulado da planilha -->
+                            <div class="p-5 sm:p-6 bg-slate-50/60">
+                                <div class="grid grid-cols-3 gap-3 mb-5">
+                                    <div class="bg-white p-3.5 rounded-xl border border-slate-200/80 shadow-sm">
+                                        <p class="text-[11px] font-semibold uppercase text-slate-400">Atividades</p>
+                                        <p class="text-xl font-bold text-slate-800 mt-0.5">12 Itens</p>
+                                    </div>
+                                    <div class="bg-white p-3.5 rounded-xl border border-slate-200/80 shadow-sm">
+                                        <p class="text-[11px] font-semibold uppercase text-slate-400">Concluídas</p>
+                                        <p class="text-xl font-bold text-emerald-600 mt-0.5">68%</p>
+                                    </div>
+                                    <div class="bg-white p-3.5 rounded-xl border border-slate-200/80 shadow-sm">
+                                        <p class="text-[11px] font-semibold uppercase text-slate-400">Orçamento</p>
+                                        <p class="text-xl font-bold text-brand-600 mt-0.5">R$ 2.450</p>
+                                    </div>
+                                </div>
+
+                                <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+                                    <div class="px-4 py-2.5 bg-slate-100 border-b border-slate-200 flex justify-between text-xs font-bold text-slate-600 uppercase">
+                                        <span>Atividade / Meta</span>
+                                        <span>Status</span>
+                                    </div>
+                                    <div class="divide-y divide-slate-100 text-sm">
+                                        <div class="px-4 py-3 flex items-center justify-between">
+                                            <div>
+                                                <p class="font-semibold text-slate-800">Planejamento financeiro mensal</p>
+                                                <p class="text-xs text-slate-400">Finanças • Prioridade Alta</p>
+                                            </div>
+                                            <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">Concluído</span>
+                                        </div>
+                                        <div class="px-4 py-3 flex items-center justify-between">
+                                            <div>
+                                                <p class="font-semibold text-slate-800">Apresentação Projeto Startup</p>
+                                                <p class="text-xs text-slate-400">Trabalho • Prioridade Alta</p>
+                                            </div>
+                                            <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-brand-50 text-brand-700 border border-brand-200">Em Andamento</span>
+                                        </div>
+                                        <div class="px-4 py-3 flex items-center justify-between">
+                                            <div>
+                                                <p class="font-semibold text-slate-800">Consulta médica de rotina</p>
+                                                <p class="text-xs text-slate-400">Saúde • Prioridade Média</p>
+                                            </div>
+                                            <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">Pendente</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção de Funcionalidades Principais -->
+        <section id="funcionalidades" class="py-20 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <span class="text-xs font-bold uppercase tracking-widest text-brand-600">Recursos Essenciais</span>
+                    <h2 class="mt-2 text-3xl sm:text-4xl font-extrabold text-slate-900">
+                        Tudo o que você precisa para ter controle da sua rotina
+                    </h2>
+                    <p class="mt-4 text-slate-600 text-base sm:text-lg">
+                        Projetado para unir a velocidade de uma planilha tradicional com a beleza e praticidade de um aplicativo moderno.
+                    </p>
+                </div>
+
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Card 1 -->
+                    <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200/80 hover:border-brand-300 hover:shadow-lg hover:shadow-brand-600/5 transition-all">
+                        <div class="w-12 h-12 rounded-xl bg-brand-600 text-white flex items-center justify-center mb-5 shadow-md shadow-brand-600/20">
+                            <i data-lucide="table" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-2">Planilha Inteligente</h3>
+                        <p class="text-sm text-slate-600 leading-relaxed">
+                            Crie, edite, atualize status com um clique e exclua registros de forma intuitiva em uma tabela limpa e organizada.
+                        </p>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200/80 hover:border-brand-300 hover:shadow-lg hover:shadow-brand-600/5 transition-all">
+                        <div class="w-12 h-12 rounded-xl bg-slate-800 text-white flex items-center justify-center mb-5 shadow-md">
+                            <i data-lucide="wallet" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-2">Controle Financeiro</h3>
+                        <p class="text-sm text-slate-600 leading-relaxed">
+                            Associe valores e orçamentos às suas tarefas e acompanhe automaticamente o balanço total no topo do painel.
+                        </p>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200/80 hover:border-brand-300 hover:shadow-lg hover:shadow-brand-600/5 transition-all">
+                        <div class="w-12 h-12 rounded-xl bg-brand-600 text-white flex items-center justify-center mb-5 shadow-md shadow-brand-600/20">
+                            <i data-lucide="search" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-2">Filtros e Busca Rápida</h3>
+                        <p class="text-sm text-slate-600 leading-relaxed">
+                            Encontre qualquer compromisso em milissegundos filtrando por categoria (Trabalho, Saúde, Finanças) ou status.
+                        </p>
+                    </div>
+
+                    <!-- Card 4 -->
+                    <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200/80 hover:border-brand-300 hover:shadow-lg hover:shadow-brand-600/5 transition-all">
+                        <div class="w-12 h-12 rounded-xl bg-slate-800 text-white flex items-center justify-center mb-5 shadow-md">
+                            <i data-lucide="hard-drive" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-2">Armazenamento Local</h3>
+                        <p class="text-sm text-slate-600 leading-relaxed">
+                            Seus dados ficam salvos automaticamente no seu dispositivo via LocalStorage. Feche e volte quando quiser sem perder nada.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção Como Funciona / Chamada Final -->
+        <section id="como-funciona" class="py-16 bg-slate-900 text-white">
+            <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight">
+                    Pronto para colocar sua rotina nos trilhos?
+                </h2>
+                <p class="mt-4 text-slate-300 text-lg max-w-2xl mx-auto">
+                    Experimente agora mesmo o painel interativo do <strong>Projeto Planilha</strong>. Já deixamos alguns exemplos prontos para você testar!
+                </p>
+                <div class="mt-8 flex flex-wrap justify-center gap-4">
+                    <button onclick="switchView('dashboard')" class="px-8 py-4 text-base font-bold text-slate-900 bg-white hover:bg-brand-50 rounded-xl shadow-lg transition-all">
+                        Abrir Painel Principal
+                    </button>
+                    <button onclick="openAuthModal('login')" class="px-8 py-4 text-base font-semibold text-white bg-brand-600 hover:bg-brand-500 rounded-xl border border-brand-500 transition-all">
+                        Fazer Login
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ===================================================================== -->
+    <!-- VISÃO 2: PAINEL PRINCIPAL (DASHBOARD CRUD - PROJETO PLANILHA)         -->
+    <!-- ===================================================================== -->
+    <section id="dashboard-view" class="hidden flex-1 py-8 bg-slate-50 fade-in">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <!-- Cabeçalho do Painel -->
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+                <div>
+                    <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-brand-600 mb-1">
+                        <i data-lucide="folder-kanban" class="w-4 h-4"></i>
+                        <span>Workspace Pessoal • Salvamento Automático Ativo</span>
+                    </div>
+                    <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900">
+                        Painel Projeto Planilha
+                    </h1>
+                    <p class="text-sm text-slate-500 mt-1">
+                        Gerencie suas tarefas, metas e orçamento diário em um só lugar.
+                    </p>
+                </div>
+
+                <!-- Botões de Ação do Painel -->
+                <div class="flex flex-wrap items-center gap-3">
+                    <button onclick="resetDemoData()" title="Restaurar itens de exemplo" class="inline-flex items-center gap-2 px-3.5 py-2.5 text-sm font-medium text-slate-600 bg-white hover:bg-slate-100 border border-slate-300 rounded-xl transition-all">
+                        <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                        <span>Restaurar Exemplos</span>
+                    </button>
+                    <button onclick="openItemModal()" class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-xl shadow-md shadow-brand-600/20 transition-all">
+                        <i data-lucide="plus" class="w-5 h-5"></i>
+                        <span>Novo Registro</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Cards de Resumo / Indicadores (KPIs) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <!-- Total de Itens -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Total de Registros</p>
+                        <p id="stat-total" class="text-2xl font-extrabold text-slate-900 mt-1">0</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center">
+                        <i data-lucide="layers" class="w-6 h-6"></i>
+                    </div>
+                </div>
+
+                <!-- Concluídas -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Concluídos</p>
+                        <p id="stat-completed" class="text-2xl font-extrabold text-emerald-600 mt-1">0</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                        <i data-lucide="check-circle-2" class="w-6 h-6"></i>
+                    </div>
+                </div>
+
+                <!-- Pendentes / Em Andamento -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Pendentes / Ativos</p>
+                        <p id="stat-pending" class="text-2xl font-extrabold text-amber-600 mt-1">0</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                        <i data-lucide="clock" class="w-6 h-6"></i>
+                    </div>
+                </div>
+
+                <!-- Balanço Financeiro -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Orçamento Total</p>
+                        <p id="stat-budget" class="text-2xl font-extrabold text-brand-600 mt-1">R$ 0,00</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center">
+                        <i data-lucide="banknote" class="w-6 h-6"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Barra de Busca e Filtros -->
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
+                    <!-- Campo de Pesquisa -->
+                    <div class="md:col-span-5 relative">
+                        <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                        <input type="text" id="search-input" oninput="renderTable()" placeholder="Buscar por título ou anotação..." 
+                            class="w-full pl-10 pr-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all">
+                    </div>
+
+                    <!-- Filtro por Categoria -->
+                    <div class="md:col-span-3">
+                        <select id="filter-category" onchange="renderTable()" 
+                            class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all">
+                            <option value="Todas">Todas as Categorias</option>
+                            <option value="Trabalho">💼 Trabalho</option>
+                            <option value="Pessoal">🏠 Pessoal</option>
+                            <option value="Finanças">💰 Finanças</option>
+                            <option value="Saúde">❤️ Saúde</option>
+                        </select>
+                    </div>
+
+                    <!-- Filtro por Status -->
+                    <div class="md:col-span-3">
+                        <select id="filter-status" onchange="renderTable()" 
+                            class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all">
+                            <option value="Todos">Todos os Status</option>
+                            <option value="Pendente">⏳ Pendente</option>
+                            <option value="Em Andamento">🔄 Em Andamento</option>
+                            <option value="Concluído">✅ Concluído</option>
+                        </select>
+                    </div>
+
+                    <!-- Botão Limpar Filtros -->
+                    <div class="md:col-span-1 flex items-center">
+                        <button onclick="clearFilters()" title="Limpar filtros" class="w-full h-full py-2.5 flex items-center justify-center text-slate-500 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors">
+                            <i data-lucide="filter-x" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabela Estilo Planilha (CRUD Read / Update / Delete) -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-100/90 border-b border-slate-200 text-xs font-bold uppercase tracking-wider text-slate-600">
+                                <th class="py-3.5 px-4 w-12 text-center">#</th>
+                                <th class="py-3.5 px-4">Atividade / Descrição</th>
+                                <th class="py-3.5 px-4">Categoria</th>
+                                <th class="py-3.5 px-4">Prioridade</th>
+                                <th class="py-3.5 px-4">Data</th>
+                                <th class="py-3.5 px-4 text-right">Valor / Orçamento</th>
+                                <th class="py-3.5 px-4 text-center">Status (Clique p/ alternar)</th>
+                                <th class="py-3.5 px-4 text-right">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="spreadsheet-body" class="divide-y divide-slate-200/80 text-sm">
+                            <!-- Linhas geradas dinamicamente via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Estado Vazio (Exibido quando não há itens ou filtro não encontra nada) -->
+                <div id="empty-state" class="hidden py-16 px-4 text-center">
+                    <div class="w-16 h-16 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-4">
+                        <i data-lucide="clipboard-list" class="w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-800">Nenhum registro encontrado</h3>
+                    <p class="text-sm text-slate-500 max-w-md mx-auto mt-1">
+                        Não encontramos itens com os filtros atuais ou sua planilha está vazia. Clique em <strong>"Novo Registro"</strong> para começar!
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- RODAPÉ                                                                -->
+    <!-- ===================================================================== -->
+    <footer class="bg-white border-t border-slate-200 py-6 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-500">
+            <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-800">ORGANIZA</span>
+                <span>•</span>
+                <span>Projeto Planilha & Organizador de Vida</span>
+            </div>
+            <p>Construído passo a passo • Seus dados são salvos localmente no seu navegador.</p>
+        </div>
+    </footer>
+
+    <!-- ===================================================================== -->
+    <!-- MODAL 1: CRIAR / EDITAR REGISTRO (CRUD)                               -->
+    <!-- ===================================================================== -->
+    <div id="item-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden fade-in">
+            <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                <h3 id="modal-title" class="text-lg font-bold text-slate-900">Novo Registro na Planilha</h3>
+                <button onclick="closeItemModal()" class="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-200/60 transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <form id="item-form" onsubmit="handleItemSubmit(event)" class="p-6 space-y-4">
+                <input type="hidden" id="item-id">
+
+                <!-- Título -->
+                <div>
+                    <label for="item-title" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                        Título da Atividade / Meta *
+                    </label>
+                    <input type="text" id="item-title" required placeholder="Ex: Pagar conta de internet, Estudar JavaScript..."
+                        class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+
+                <!-- Categoria e Prioridade -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="item-category" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                            Categoria *
+                        </label>
+                        <select id="item-category" required
+                            class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            <option value="Trabalho">💼 Trabalho</option>
+                            <option value="Pessoal">🏠 Pessoal</option>
+                            <option value="Finanças">💰 Finanças</option>
+                            <option value="Saúde">❤️ Saúde</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="item-priority" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                            Prioridade *
+                        </label>
+                        <select id="item-priority" required
+                            class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            <option value="Alta">🔴 Alta</option>
+                            <option value="Média" selected>🟡 Média</option>
+                            <option value="Baixa">🟢 Baixa</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Data e Valor/Orçamento -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="item-date" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                            Data Prevista *
+                        </label>
+                        <input type="date" id="item-date" required
+                            class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+
+                    <div>
+                        <label for="item-value" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                            Valor / Orçamento (R$)
+                        </label>
+                        <input type="number" id="item-value" step="0.01" min="0" placeholder="0,00"
+                            class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+                </div>
+
+                <!-- Status -->
+                <div>
+                    <label for="item-status" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                        Status Atual
+                    </label>
+                    <select id="item-status"
+                        class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        <option value="Pendente">⏳ Pendente</option>
+                        <option value="Em Andamento">🔄 Em Andamento</option>
+                        <option value="Concluído">✅ Concluído</option>
+                    </select>
+                </div>
+
+                <!-- Botões do Modal -->
+                <div class="pt-4 border-t border-slate-200 flex items-center justify-end gap-3">
+                    <button type="button" onclick="closeItemModal()" class="px-4 py-2.5 text-sm font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="px-5 py-2.5 text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-xl shadow-md shadow-brand-600/20 transition-all">
+                        Salvar na Planilha
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MODAL 2: CONFIRMAÇÃO DE EXCLUSÃO (SEM USAR window.confirm)            -->
+    <!-- ===================================================================== -->
+    <div id="delete-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md p-6 text-center fade-in">
+            <div class="w-14 h-14 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto mb-4">
+                <i data-lucide="trash-2" class="w-7 h-7"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-900">Excluir este registro?</h3>
+            <p class="text-sm text-slate-500 mt-2">
+                Tem certeza que deseja remover <strong id="delete-item-name" class="text-slate-800"></strong> da sua planilha? Esta ação não pode ser desfeita.
+            </p>
+            <div class="mt-6 flex items-center justify-center gap-3">
+                <button onclick="closeDeleteModal()" class="px-4 py-2.5 text-sm font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors">
+                    Cancelar
+                </button>
+                <button onclick="confirmDelete()" class="px-5 py-2.5 text-sm font-semibold text-white bg-rose-600 hover:bg-rose-700 rounded-xl shadow-md shadow-rose-600/20 transition-all">
+                    Sim, Excluir
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MODAL 3: LOGIN E CADASTRO (EXPERIÊNCIA INTERATIVA)                    -->
+    <!-- ===================================================================== -->
+    <div id="auth-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden fade-in">
+            <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <div class="w-7 h-7 rounded-lg bg-brand-600 text-white flex items-center justify-center">
+                        <i data-lucide="layout-grid" class="w-4 h-4"></i>
+                    </div>
+                    <h3 id="auth-modal-title" class="text-lg font-bold text-slate-900">Entrar no ORGANIZA</h3>
+                </div>
+                <button onclick="closeAuthModal()" class="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-200/60 transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="p-6 space-y-4">
+                <!-- Campo Nome (Exibido apenas no Cadastro) -->
+                <div id="auth-name-group" class="hidden">
+                    <label for="auth-name" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                        Seu Nome
+                    </label>
+                    <input type="text" id="auth-name" placeholder="Como devemos te chamar?"
+                        class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+
+                <div>
+                    <label for="auth-email" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                        E-mail
+                    </label>
+                    <input type="email" id="auth-email" required placeholder="voce@exemplo.com"
+                        class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+
+                <div>
+                    <label for="auth-password" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                        Senha
+                    </label>
+                    <input type="password" id="auth-password" required placeholder="••••••••"
+                        class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+
+                <button type="submit" id="auth-submit-btn" class="w-full py-3 text-sm font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-xl shadow-md shadow-brand-600/20 transition-all">
+                    Acessar Meu Painel
+                </button>
+
+                <div class="text-center pt-2">
+                    <button type="button" id="auth-toggle-mode" onclick="toggleAuthMode()" class="text-xs font-semibold text-brand-600 hover:underline">
+                        Não tem conta? Cadastre-se gratuitamente
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notificação Toast Flutuante -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 hidden items-center gap-2.5 px-4 py-3 rounded-xl bg-slate-900 text-white text-sm font-medium shadow-xl border border-slate-700 fade-in">
+        <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+        <span id="toast-message">Ação realizada com sucesso!</span>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- LÓGICA JAVASCRIPT (CRUD, ESTADO, LOCALSTORAGE E NAVEGAÇÃO)            -->
+    <!-- ===================================================================== -->
+    <script>
+        // Chaves de armazenamento no navegador (LocalStorage)
+        const STORAGE_KEY = 'organiza_planilha_items_v1';
+        const USER_KEY = 'organiza_user_name_v1';
+
+        // Estado global da aplicação
+        let items = [];
+        let itemToDeleteId = null;
+        let currentAuthMode = 'login'; // 'login' ou 'register'
+
+        // Dados de exemplo pré-carregados na primeira visita
+        const defaultDemoItems = [
+            {
+                id: 'demo-1',
+                title: 'Estruturar metas da startup para Dezembro',
+                category: 'Trabalho',
+                priority: 'Alta',
+                date: new Date().toISOString().split('T')[0],
+                value: 0,
+                status: 'Em Andamento'
+            },
+            {
+                id: 'demo-2',
+                title: 'Reserva de emergência e controle de contas',
+                category: 'Finanças',
+                priority: 'Alta',
+                date: new Date().toISOString().split('T')[0],
+                value: 1250.00,
+                status: 'Concluído'
+            },
+            {
+                id: 'demo-3',
+                title: 'Check-up médico e exames de rotina',
+                category: 'Saúde',
+                priority: 'Média',
+                date: new Date(Date.now() + 86400000 * 3).toISOString().split('T')[0],
+                value: 280.00,
+                status: 'Pendente'
+            },
+            {
+                id: 'demo-4',
+                title: 'Organizar arquivos da pasta NOSSA_STARTUP',
+                category: 'Pessoal',
+                priority: 'Baixa',
+                date: new Date(Date.now() + 86400000 * 5).toISOString().split('T')[0],
+                value: 0,
+                status: 'Pendente'
+            }
+        ];
+
+        // Inicialização quando a página termina de carregar
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                loadUser();
+                loadItems();
+                renderTable();
+                lucide.createIcons();
+            } catch (error) {
+                console.error('Erro ao inicializar o ORGANIZA:', error);
+            }
+        });
+
+        // ---------------------------------------------------------------------
+        // GERENCIAMENTO DE DADOS (LOCALSTORAGE)
+        // ---------------------------------------------------------------------
+        function loadItems() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                items = JSON.parse(saved);
+            } else {
+                // Primeira visita: carrega os dados de demonstração
+                items = [...defaultDemoItems];
+                saveItems();
+            }
+        }
+
+        function saveItems() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+            updateStats();
+        }
+
+        function resetDemoData() {
+            items = [...defaultDemoItems];
+            saveItems();
+            renderTable();
+            showToast('Dados de exemplo restaurados na planilha!');
+        }
+
+        // ---------------------------------------------------------------------
+        // NAVEGAÇÃO ENTRE LANDING PAGE E PAINEL PRINCIPAL
+        // ---------------------------------------------------------------------
+        function switchView(viewName) {
+            const landingView = document.getElementById('landing-view');
+            const dashboardView = document.getElementById('dashboard-view');
+            const landingNavLinks = document.getElementById('landing-nav-links');
+            const authButtonsGroup = document.getElementById('auth-buttons-group');
+            const dashboardNavGroup = document.getElementById('dashboard-nav-group');
+
+            if (viewName === 'dashboard') {
+                landingView.classList.add('hidden');
+                dashboardView.classList.remove('hidden');
+                landingNavLinks.classList.add('hidden');
+                authButtonsGroup.classList.add('hidden');
+                dashboardNavGroup.classList.remove('hidden');
+                renderTable();
+            } else {
+                dashboardView.classList.add('hidden');
+                landingView.classList.remove('hidden');
+                landingNavLinks.classList.remove('hidden');
+                landingNavLinks.classList.add('md:flex');
+                authButtonsGroup.classList.remove('hidden');
+                dashboardNavGroup.classList.add('hidden');
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            lucide.createIcons();
+        }
+
+        // ---------------------------------------------------------------------
+        // AUTENTICAÇÃO SIMULADA (LOGIN E CADASTRO)
+        // ---------------------------------------------------------------------
+        function loadUser() {
+            const savedName = localStorage.getItem(USER_KEY);
+            if (savedName) {
+                document.getElementById('user-name-display').textContent = savedName;
+            }
+        }
+
+        function openAuthModal(mode) {
+            currentAuthMode = mode;
+            const modal = document.getElementById('auth-modal');
+            const title = document.getElementById('auth-modal-title');
+            const nameGroup = document.getElementById('auth-name-group');
+            const submitBtn = document.getElementById('auth-submit-btn');
+            const toggleBtn = document.getElementById('auth-toggle-mode');
+
+            if (mode === 'register') {
+                title.textContent = 'Criar Conta no ORGANIZA';
+                nameGroup.classList.remove('hidden');
+                submitBtn.textContent = 'Cadastrar e Abrir Planilha';
+                toggleBtn.textContent = 'Já possui conta? Faça login aqui';
+            } else {
+                title.textContent = 'Entrar no ORGANIZA';
+                nameGroup.classList.add('hidden');
+                submitBtn.textContent = 'Entrar no Meu Painel';
+                toggleBtn.textContent = 'Não tem conta? Cadastre-se gratuitamente';
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            lucide.createIcons();
+        }
+
+        function closeAuthModal() {
+            const modal = document.getElementById('auth-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function toggleAuthMode() {
+            openAuthModal(currentAuthMode === 'login' ? 'register' : 'login');
+        }
+
+        function handleAuthSubmit(event) {
+            event.preventDefault();
+            const emailInput = document.getElementById('auth-email').value.trim();
+            const nameInput = document.getElementById('auth-name').value.trim();
+
+            let displayName = nameInput;
+            if (!displayName && emailInput) {
+                // Usa a primeira parte do e-mail caso seja login direto
+                displayName = emailInput.split('@')[0];
+                displayName = displayName.charAt(0).toUpperCase() + displayName.slice(1);
+            }
+
+            if (displayName) {
+                localStorage.setItem(USER_KEY, displayName);
+                document.getElementById('user-name-display').textContent = displayName;
+            }
+
+            closeAuthModal();
+            switchView('dashboard');
+            showToast(`Bem-vindo(a), ${displayName || 'Usuário'}!`);
+        }
+
+        // ---------------------------------------------------------------------
+        // OPERAÇÕES CRUD DA PLANILHA (CREATE, READ, UPDATE, DELETE)
+        // ---------------------------------------------------------------------
+
+        // READ: Renderiza a tabela filtrada e atualiza os indicadores
+        function renderTable() {
+            const tbody = document.getElementById('spreadsheet-body');
+            const emptyState = document.getElementById('empty-state');
+            const searchTerm = document.getElementById('search-input').value.toLowerCase().trim();
+            const categoryFilter = document.getElementById('filter-category').value;
+            const statusFilter = document.getElementById('filter-status').value;
+
+            // Filtra os registros conforme busca e seletores
+            const filteredItems = items.filter(item => {
+                const matchesSearch = item.title.toLowerCase().includes(searchTerm) || 
+                                      item.category.toLowerCase().includes(searchTerm);
+                const matchesCategory = categoryFilter === 'Todas' || item.category === categoryFilter;
+                const matchesStatus = statusFilter === 'Todos' || item.status === statusFilter;
+                return matchesSearch && matchesCategory && matchesStatus;
+            });
+
+            tbody.innerHTML = '';
+
+            if (filteredItems.length === 0) {
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+
+                filteredItems.forEach((item, index) => {
+                    const tr = document.createElement('tr');
+                    tr.className = 'spreadsheet-row transition-colors';
+
+                    // Formatação de moeda BRL
+                    const formattedValue = Number(item.value || 0).toLocaleString('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL'
+                    });
+
+                    // Formatação de data DD/MM/AAAA
+                    const formattedDate = formatDateBR(item.date);
+
+                    // Badges visuais de Prioridade
+                    const priorityBadge = getPriorityBadge(item.priority);
+
+                    // Badges visuais de Status (clicáveis para alternar rápido)
+                    const statusBadge = getStatusBadge(item.status);
+
+                    // Estilo riscado suave se estiver concluído
+                    const titleStyle = item.status === 'Concluído' 
+                        ? 'line-through text-slate-400 font-medium' 
+                        : 'text-slate-800 font-semibold';
+
+                    tr.innerHTML = `
+                        <td class="py-3.5 px-4 text-center text-xs font-mono text-slate-400">${index + 1}</td>
+                        <td class="py-3.5 px-4 ${titleStyle}">${escapeHTML(item.title)}</td>
+                        <td class="py-3.5 px-4">
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200/80">
+                                ${getCategoryIcon(item.category)} ${escapeHTML(item.category)}
+                            </span>
+                        </td>
+                        <td class="py-3.5 px-4">${priorityBadge}</td>
+                        <td class="py-3.5 px-4 text-slate-600 text-xs font-medium whitespace-nowrap">${formattedDate}</td>
+                        <td class="py-3.5 px-4 text-right font-mono text-xs font-semibold text-slate-700 whitespace-nowrap">${formattedValue}</td>
+                        <td class="py-3.5 px-4 text-center">
+                            <button onclick="cycleStatus('${item.id}')" title="Clique para alternar o status" class="cursor-pointer transition-transform active:scale-95">
+                                ${statusBadge}
+                            </button>
+                        </td>
+                        <td class="py-3.5 px-4 text-right whitespace-nowrap">
+                            <div class="inline-flex items-center gap-1">
+                                <button onclick="openItemModal('${item.id}')" title="Editar registro" class="p-2 text-slate-500 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors">
+                                    <i data-lucide="pencil" class="w-4 h-4"></i>
+                                </button>
+                                <button onclick="openDeleteModal('${item.id}')" title="Excluir registro" class="p-2 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            updateStats();
+            lucide.createIcons();
+        }
+
+        // Atualiza os 4 cards de indicadores no topo do painel
+        function updateStats() {
+            const total = items.length;
+            const completed = items.filter(i => i.status === 'Concluído').length;
+            const pending = total - completed;
+            const totalBudget = items.reduce((acc, curr) => acc + (parseFloat(curr.value) || 0), 0);
+
+            document.getElementById('stat-total').textContent = total;
+            document.getElementById('stat-completed').textContent = completed;
+            document.getElementById('stat-pending').textContent = pending;
+            document.getElementById('stat-budget').textContent = totalBudget.toLocaleString('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            });
+        }
+
+        // CREATE / UPDATE: Abre o modal preenchido (edição) ou limpo (novo)
+        function openItemModal(id = null) {
+            const modal = document.getElementById('item-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const form = document.getElementById('item-form');
+
+            form.reset();
+
+            if (id) {
+                const item = items.find(i => i.id === id);
+                if (!item) return;
+                modalTitle.textContent = 'Editar Registro';
+                document.getElementById('item-id').value = item.id;
+                document.getElementById('item-title').value = item.title;
+                document.getElementById('item-category').value = item.category;
+                document.getElementById('item-priority').value = item.priority;
+                document.getElementById('item-date').value = item.date;
+                document.getElementById('item-value').value = item.value || '';
+                document.getElementById('item-status').value = item.status;
+            } else {
+                modalTitle.textContent = 'Novo Registro na Planilha';
+                document.getElementById('item-id').value = '';
+                document.getElementById('item-date').value = new Date().toISOString().split('T')[0];
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.getElementById('item-title').focus();
+            lucide.createIcons();
+        }
+
+        function closeItemModal() {
+            const modal = document.getElementById('item-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function handleItemSubmit(event) {
+            event.preventDefault();
+
+            const id = document.getElementById('item-id').value;
+            const title = document.getElementById('item-title').value.trim();
+            const category = document.getElementById('item-category').value;
+            const priority = document.getElementById('item-priority').value;
+            const date = document.getElementById('item-date').value;
+            const value = parseFloat(document.getElementById('item-value').value) || 0;
+            const status = document.getElementById('item-status').value;
+
+            if (!title) return;
+
+            if (id) {
+                // Atualizar existente (Update)
+                const index = items.findIndex(i => i.id === id);
+                if (index !== -1) {
+                    items[index] = { id, title, category, priority, date, value, status };
+                    showToast('Registro atualizado com sucesso!');
+                }
+            } else {
+                // Criar novo (Create)
+                const newItem = {
+                    id: 'item-' + Date.now(),
+                    title,
+                    category,
+                    priority,
+                    date,
+                    value,
+                    status
+                };
+                items.unshift(newItem);
+                showToast('Novo registro adicionado à planilha!');
+            }
+
+            saveItems();
+            renderTable();
+            closeItemModal();
+        }
+
+        // UPDATE RÁPIDO: Alterna o status com um clique direto na tabela
+        function cycleStatus(id) {
+            const order = ['Pendente', 'Em Andamento', 'Concluído'];
+            const index = items.findIndex(i => i.id === id);
+            if (index !== -1) {
+                const currentStatus = items[index].status;
+                const nextStatus = order[(order.indexOf(currentStatus) + 1) % order.length];
+                items[index].status = nextStatus;
+                saveItems();
+                renderTable();
+                showToast(`Status alterado para "${nextStatus}"`);
+            }
+        }
+
+        // DELETE: Exclusão com modal de confirmação seguro
+        function openDeleteModal(id) {
+            const item = items.find(i => i.id === id);
+            if (!item) return;
+            itemToDeleteId = id;
+            document.getElementById('delete-item-name').textContent = `"${item.title}"`;
+            const modal = document.getElementById('delete-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            lucide.createIcons();
+        }
+
+        function closeDeleteModal() {
+            itemToDeleteId = null;
+            const modal = document.getElementById('delete-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function confirmDelete() {
+            if (!itemToDeleteId) return;
+            items = items.filter(i => i.id !== itemToDeleteId);
+            saveItems();
+            renderTable();
+            closeDeleteModal();
+            showToast('Registro excluído da planilha.');
+        }
+
+        // Limpar filtros de pesquisa
+        function clearFilters() {
+            document.getElementById('search-input').value = '';
+            document.getElementById('filter-category').value = 'Todas';
+            document.getElementById('filter-status').value = 'Todos';
+            renderTable();
+        }
+
+        // ---------------------------------------------------------------------
+        // FUNÇÕES AUXILIARES VISUAIS E DE FORMATAÇÃO
+        // ---------------------------------------------------------------------
+        function getCategoryIcon(category) {
+            const icons = {
+                'Trabalho': '💼',
+                'Pessoal': '🏠',
+                'Finanças': '💰',
+                'Saúde': '❤️'
+            };
+            return icons[category] || '📌';
+        }
+
+        function getPriorityBadge(priority) {
+            if (priority === 'Alta') {
+                return `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">Alta</span>`;
+            }
+            if (priority === 'Média') {
+                return `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">Média</span>`;
+            }
+            return `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200">Baixa</span>`;
+        }
+
+        function getStatusBadge(status) {
+            if (status === 'Concluído') {
+                return `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span> Concluído
+                </span>`;
+            }
+            if (status === 'Em Andamento') {
+                return `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-brand-50 text-brand-700 border border-brand-200 hover:bg-brand-100">
+                    <span class="w-1.5 h-1.5 rounded-full bg-brand-600 animate-pulse"></span> Em Andamento
+                </span>`;
+            }
+            return `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Pendente
+            </span>`;
+        }
+
+        function formatDateBR(dateStr) {
+            if (!dateStr) return '-';
+            const parts = dateStr.split('-');
+            if (parts.length !== 3) return dateStr;
+            return `${parts[2]}/${parts[1]}/${parts[0]}`;
+        }
+
+        function escapeHTML(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        let toastTimeout;
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            toastMsg.textContent = message;
+            toast.classList.remove('hidden');
+            toast.classList.add('flex');
+
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.add('hidden');
+                toast.classList.remove('flex');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
